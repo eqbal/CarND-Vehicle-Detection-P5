@@ -53,8 +53,17 @@ In this project, I'll be using both techniques, in Classification one, we will b
 - Run your pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
 - Estimate a bounding box for vehicles detected.
 
-#### 1. Object Detection
+###[Rubric](https://review.udacity.com/#!/rubrics/513/view):
 
-The Project
----
+#### Data Exploration
+
+#### Histogram of Oriented Gradients (HOG)
+
+#### Sliding Window Search
+
+#### Video Implementation
+
+## Regression
+
+## Conclusion & Discussion
 
