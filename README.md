@@ -30,6 +30,10 @@ In this project, I'll be using both techniques, in Classification one, we will b
 ## Classification:
 
 ###Files:
+
+  - 'ObjectDetectionNet':
+    - CNN network to use the Regression tp detect object.
+
   - `Dataset`:
     - Splits the data into training, validation and test set and prepare the data.
 
