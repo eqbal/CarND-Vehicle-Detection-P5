@@ -30,9 +30,10 @@ In this project, I'll be using both techniques, in Classification one, we will b
 ## Classification:
 
 ###Files:
+  - `Dataset`:
+    - Splits the data into training, validation and test set and prepare the data.
 
   - `HOGClassifier`: 
-    - Splits the data into training, validation and test set and saves them in a pickle file.
     - Trains an SVM to detect cars and non-cars. All classifier data is saved in a pickle file.
 
   - `SearchClassify`: 
