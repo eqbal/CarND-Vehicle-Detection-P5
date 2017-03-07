@@ -25,10 +25,24 @@ We can use one of the two approaches to solve this problem:
   - Generate bounding box coordinates directly from CNN
 
 In this project, I'll be using both techniques, in Classification one, we will be able to lower the false positives further. Once I'm done, I'll be using Regression with YOLO and compare the results.
-
-
 ****
 
+## Classification:
+
+###Files:
+
+  - `HOGClassifier`: 
+    - Splits the data into training, validation and test set and saves them in a pickle file.
+    - Trains an SVM to detect cars and non-cars. All classifier data is saved in a pickle file.
+
+  - `SearchClassify`: 
+    - Implements a sliding window search for cars, including false positive filtering and applies the classifier to a video
+
+  - `Playground.ipynb`:
+    - Where I run the previous two classes to train the data and test it out
+
+  - `helpers.py`:
+    - I has all the helpers methods we got in the class 
 
 ###Steps:
 
