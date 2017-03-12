@@ -75,9 +75,9 @@ dataset.inspect()
 ```
 
 ```
-X_train shape: (15984, 64, 64, 3)
-15984 train samples
-1776 test samples
+X_train shape: (14208, 64, 64, 3)
+14208 train samples
+3552 test samples
 8792 images of vehicles
 8968 images of non vehicles
 ```
@@ -86,12 +86,18 @@ All images are 64x64 pixels. A third data set released by Udacity was not used h
 
 In total there are `8792` images of vehicles and `8968` images of non vehicles. Thus the data is somehow balanced. 
 
+The quantity and quality of these sample images is critical to the process. Bad quality images will make the classifier do wrong predictions.
+
+These data are separated in training (80%) and validation sets (20%), and their order is randomized.
+
 Check out below 5 random samples for cars and non-cars images: 
 
 ![sample_cars](./assets/sample_cars_non_cars.png)
 
 #### Histogram of Oriented Gradients (HOG)
 
+- Extraction of HOG, color and spatial features.
+- 
 
 #### Sliding Window Search
 

@@ -32,7 +32,7 @@ class Dataset(object):
 
     def validation_split(self):
         self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_split(
-            self.X, self.Y, test_size=0.10, random_state=42
+            self.X, self.Y, test_size=0.20, random_state = np.random.randint(0, 100)
         )
         self.X_train = self.X_train.astype('float32')
         self.X_test  = self.X_test.astype('float32')
