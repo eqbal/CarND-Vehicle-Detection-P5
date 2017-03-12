@@ -40,6 +40,9 @@ In this project, I'll be using both techniques, in Classification one, we will b
   - `SearchClassify`: 
     - Implements a sliding window search for cars, including false positive filtering and applies the classifier to a video
 
+  - `WindowsSearch`:
+    - Implements the search over all zones and windows.
+
   - `Playground.ipynb`:
     - Where I run the previous two classes to train the data and test it out
 
@@ -159,6 +162,19 @@ And here is a sample of false negatives for not cars images:
 
 
 #### Sliding Window Search
+
+Up to now, we can feed a classifier with an 64 x 64 pixels image and get a result from it: car or non-car.
+
+In order to do this in an entire image (720 x 1280), we use a sliding window.
+
+First, I cropped just the interest region. Then sliced the image in small frames, resized it to the right size (64x64), and applied the classification algorithm we created in `hog_classifier.py`.
+
+In `WindowsSearch` class I handle all the logic for sliding window search.
+
+- I segmented the image into 4 partially overlapping zones with different sliding window sizes to account for different distances.
+- The window sizes are 240,180,120 and 70 pixels for each zone
+- Within each zone adjacent windows have an ovelap of 75%
+
 
 #### Video Implementation
 

@@ -64,8 +64,8 @@ class ObjectDetectionNet(object):
         print('Test accuracy:', score[1])
 
     def predict(self, image):
-        image = image.astype('float32')
-        result = self.model.predict(image)
+        image  = image.astype('float32')
+        result = self.model.predict_proba(image)
         print(result)
         return result[0]
 
