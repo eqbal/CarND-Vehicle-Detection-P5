@@ -4,8 +4,12 @@ from sklearn.preprocessing import StandardScaler
 from skimage.feature import hog
 from sklearn.cross_validation import train_test_split
 from helpers import *
+import pickle
 
-class HOGClassifier(data):
+
+class HOGClassifier():
+
+    FILE = 'processed_svc.p'
 
     def __init__(self, dataset):
         self.color_space = 'HLS'
@@ -64,8 +68,49 @@ class HOGClassifier(data):
 
         print('Using:',self.orient,'orientations',self.pix_per_cell,
             'pixels per cell and', self.cell_per_block,'cells per block')
-        print('Feature vector length:', len(X_train[0]))
+        print('Feature vector length:', len(self.X_train[0]))
 
+    def train(self):
+        svc = LinearSVC()
+        t=time.time()
+
+        svc.fit(self.X_train, self.y_train)
+
+        t2 = time.time()
+        print(round(t2-t, 2), 'Seconds to train SVC...')
+
+        self.svc = scv
+
+    def accuracy(self):
+        print('Test Accuracy of SVC = ', round(self.svc.score(self.X_test, self.y_test), 4))
+
+    def predict(self, img):
+        print('SVC predicts: ', self.svc.predict(img))
+
+    def save_data(self):
+        print('Saving data to pickle file...')
+        try:
+            with open(FILE, 'wb') as pfile:
+                pickle.dump(
+                    {   'svc':self.svc,
+                        'X_train': X_train,
+                        'color_space': self.color_space,
+                        'spatial_size': self.spatial_size,
+                        'hist_bins': self.hist_bins,
+                        'orient': self.orient,
+                        'pix_per_cell': self.pix_per_cell,
+                        'cell_per_block': self.cell_per_block,
+                        'hog_channel': self.hog_channel,
+                        'spatial_feat': self.spatial_feat,
+                        'hist_feat': self.hist_feat,
+                        'hog_feat':self.hog_feat
+                    },
+                    pfile, pickle.HIGHEST_PROTOCOL)
+        except Exception as e:
+            print('Unable to save data to', FILE, ':', e)
+            raise
+
+        print('Data cached in pickle file.')
 
 
 
