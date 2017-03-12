@@ -86,6 +86,9 @@ All images are 64x64 pixels. A third data set released by Udacity was not used h
 
 In total there are `8792` images of vehicles and `8968` images of non vehicles. Thus the data is somehow balanced. 
 
+Check out below 5 random samples for cars and non-cars images: 
+
+![sample_cars](./assets/sample_cars_non_cars.png)
 
 #### Histogram of Oriented Gradients (HOG)
 
