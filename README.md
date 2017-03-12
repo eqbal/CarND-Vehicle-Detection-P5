@@ -25,13 +25,10 @@ We can use one of the two approaches to solve this problem:
   - Generate bounding box coordinates directly from CNN
 
 In this project, I'll be using both techniques, in Classification one, we will be able to lower the false positives further. Once I'm done, I'll be using Regression with YOLO and compare the results.
-****
 
-## Classification:
+##Files:
 
-###Files:
-
-  - 'ObjectDetectionNet':
+  - `ObjectDetectionNet`:
     - CNN network to use the Regression tp detect object.
 
   - `Dataset`:
@@ -48,6 +45,9 @@ In this project, I'll be using both techniques, in Classification one, we will b
 
   - `helpers.py`:
     - I has all the helpers methods we got in the class 
+
+
+## Classification:
 
 ###Steps:
 
