@@ -54,8 +54,8 @@ class HOGClassifier():
         print('Feature vectors shape:',self.hog_features.shape)
 
     def scale_features(self):
-        X_scaler = StandardScaler().fit(self.hog_features)
-        self.scaled_hog_features = X_scaler.transform(self.hog_features)
+        self.X_scaler = StandardScaler().fit(self.hog_features)
+        self.scaled_hog_features = self.X_scaler.transform(self.hog_features)
 
     def get_labels(self):
         self.Y = np.hstack((np.ones(len(self.car_features)), np.zeros(len(self.non_car_features))))

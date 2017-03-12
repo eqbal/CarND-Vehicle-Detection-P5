@@ -8,7 +8,6 @@ class WindowsSearch():
 
     def __init__(self, classifier):
         self.classifier   = classifier
-        self.X_scaler     = StandardScaler().fit(classifier.hog_features)
 
         self.X_start_stop = [[None,None],[None,None],[None,None],[None,None]]
         self.XY_window    = [(240, 240), (180, 180), (120, 120), (70, 70)]
@@ -31,7 +30,7 @@ class WindowsSearch():
 
             hot_windows +=  search_windows(image, windows,
                     self.classifier.svc,
-                    self.X_scaler,
+                    self.classifier.X_scaler,
                     color_space=self.classifier.color_space,
                     spatial_size=self.classifier.spatial_size,
                     hist_bins=self.classifier.hist_bins,
