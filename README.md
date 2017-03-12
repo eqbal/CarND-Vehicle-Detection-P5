@@ -100,6 +100,8 @@ The HOG extractor is the heart of the method described here. It is a way to extr
 
 HOG stands for (Histogram of Oriented Gradients). Basically, it divides an image in several pieces. For each piece, it calculates the gradient of variation in a given number of orientations. Example of HOG detector — the idea is the image on the right to capture the essence of original image.
 
+![Features](./assets/feature_extrac.png)
+
 My code for extracting features in `HOGClassifier` class. 
 
 I used the following params in my class (trial and error approach):
@@ -118,6 +120,34 @@ hog_feat = True
 ``` 
 
 As you can see, I used HLS space and a low value of pixels_per_cell=(8,8). Using larger values of than orient=9 did not have a striking effect and only increased the feature vector. Similarly, using values larger than cells_per_block=(2,2) did not improve results.
+
+The HOG algorithm is robust for small variations and different angles. But, on the other way, it can detect also some image that has the same general aspect of the car, but it not a car at all — the so called “False positives”.
+
+The same could be made with a color detector, in addition to HOG detector. Because the HOG only classifier was good enough, I used it in the rest of project.
+
+#### The SVC Classifier
+
+Again, most of the code for this section can be found in `HOGClassifier` class.
+
+The next step was to train a classifier. It receives the cars / non-cars data transformed with HOG detector, and returns if the sample is or is not a car.
+
+In this case, I used a Support Vector Machine Classifier (SVC), with linear kernel, based on function SVM from scikit-learn.
+
+To train my SVM classifier, I used all channels of images converted to HLS space. I included spatial features color features as well as all three HLS channels, because using less than all three channels reduced the accuracy considerably. 
+
+The final feature vector has a length of `8460` elements, most of which are HOG features. 
+
+For color binning patches of spatial_size=(16,16) were generated and color histograms were implemented using hist_bins=32 used.
+
+After training on the training set this resulted in a validation and test accuracy of `0.9893`. It took about `110.73` secs to extract the data. To train the classifier it took `92.77 Seconds`. Please refer to the `Playground` notebook to check out my findings. 
+
+The average time for a prediction (average over a hundred predictions) turned out to be about 3.3ms on my macbook pro with i7 processor, thus allowing a theoretical bandwidth of 300Hz.
+
+A realtime application would therfore only feasible if several parts of the image are examined in parallel in a similar time.
+
+Using just the L channel reduced the feature vector to about a third, while test and validation accuracy dropped to about 94.5% each.
+
+Despite the high accuracy there is a systematic error as can be seen from investigating the false positive detections.
 
 
 #### Sliding Window Search

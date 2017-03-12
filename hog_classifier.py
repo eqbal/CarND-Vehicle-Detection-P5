@@ -79,7 +79,7 @@ class HOGClassifier():
         t2 = time.time()
         print(round(t2-t, 2), 'Seconds to train SVC...')
 
-        self.svc = scv
+        self.svc = svc
 
     def accuracy(self):
         print('Test Accuracy of SVC = ', round(self.svc.score(self.X_test, self.y_test), 4))
