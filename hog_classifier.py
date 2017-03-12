@@ -112,6 +112,9 @@ class HOGClassifier():
 
         print('Data cached in pickle file.')
 
+    def load_model(self):
+        self.svc = pickle.load(open("saved_svc.p","rb"))
+
 
 
 

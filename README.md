@@ -149,6 +149,14 @@ Using just the L channel reduced the feature vector to about a third, while test
 
 Despite the high accuracy there is a systematic error as can be seen from investigating the false positive detections.
 
+Here is a sample of false negatives for car images: 
+
+![false_cars](./assets/misclassified_cars.png)
+
+And here is a sample of false negatives for not cars images: 
+
+![false_non_cars](./assets/misclassified_non_cars.png)
+
 
 #### Sliding Window Search
 
