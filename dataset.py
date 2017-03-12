@@ -13,9 +13,9 @@ class Dataset(object):
         self.X        = []
 
     def call(self):
-        self.generate_Y_vector
-        self.generate_X_vector
-        self.validation_split
+        self.generate_Y_vector()
+        self.generate_X_vector()
+        self.validation_split()
 
     def generate_Y_vector(self):
         self.Y = np.concatenate([
@@ -28,7 +28,7 @@ class Dataset(object):
             self.X.append(skimage.io.imread(name))
         for name in self.non_cars:
             self.X.append(skimage.io.imread(name))
-        self.X = np.array(X)
+        self.X = np.array(self.X)
 
     def validation_split(self):
         self.X_train, self.X_test, self.Y_train, self.Y_test = train_test_split(
@@ -41,3 +41,5 @@ class Dataset(object):
         print('X_train shape:', self.X_train.shape)
         print(self.X_train.shape[0], 'train samples')
         print(self.X_test.shape[0], 'test samples')
+        print(len(self.cars), 'images of vehicles')
+        print(len(self.non_cars), 'images of non vehicles')

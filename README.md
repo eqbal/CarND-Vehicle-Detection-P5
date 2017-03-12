@@ -62,7 +62,33 @@ In this project, I'll be using both techniques, in Classification one, we will b
 
 #### Data Exploration
 
+I'm using the data from udacitys `Vehicle Detection and Tracking` project. The images provided (car and non car) shoulb be placed in ../data/vehicles/ and ../data/non-vehicles/.
+
+I'm using `Dataset` class to do the parsing and splitting data to validation and training sets. 
+
+```python
+from dataset import Dataset
+
+dataset = Dataset()
+dataset.call()
+dataset.inspect()
+```
+
+```
+X_train shape: (15984, 64, 64, 3)
+15984 train samples
+1776 test samples
+8792 images of vehicles
+8968 images of non vehicles
+```
+
+All images are 64x64 pixels. A third data set released by Udacity was not used here. 
+
+In total there are `8792` images of vehicles and `8968` images of non vehicles. Thus the data is somehow balanced. 
+
+
 #### Histogram of Oriented Gradients (HOG)
+
 
 #### Sliding Window Search
 
