@@ -35,7 +35,7 @@ In this project, I'll be using both techniques, in Classification one, we will b
     - Splits the data into training, validation and test set and prepare the data.
 
   - `HOGClassifier`: 
-    - Trains an SVM to detect cars and non-cars. All classifier data is saved in a pickle file.
+    - Trains an SVM to detect cars and non-cars. It extracts HOGs features too.
 
   - `SearchClassify`: 
     - Implements a sliding window search for cars, including false positive filtering and applies the classifier to a video
@@ -96,8 +96,29 @@ Check out below 5 random samples for cars and non-cars images:
 
 #### Histogram of Oriented Gradients (HOG)
 
-- Extraction of HOG, color and spatial features.
-- 
+The HOG extractor is the heart of the method described here. It is a way to extract meaningful features of a image. It captures the general aspect of cars, not the specific details of it. It is the same as we, humans do, in a first glance, we locate the car, not the make, the plate, the wheel, or other small detail.
+
+HOG stands for (Histogram of Oriented Gradients). Basically, it divides an image in several pieces. For each piece, it calculates the gradient of variation in a given number of orientations. Example of HOG detector — the idea is the image on the right to capture the essence of original image.
+
+My code for extracting features in `HOGClassifier` class. 
+
+I used the following params in my class (trial and error approach):
+
+```
+color_space = 'HLS'
+spatial_size = (16, 16)
+hist_bins = 32
+orient = 9
+pix_per_cell = 8
+cell_per_block = 2
+hog_channel = 'ALL'
+spatial_feat = True
+hist_feat = True
+hog_feat = True
+``` 
+
+As you can see, I used HLS space and a low value of pixels_per_cell=(8,8). Using larger values of than orient=9 did not have a striking effect and only increased the feature vector. Similarly, using values larger than cells_per_block=(2,2) did not improve results.
+
 
 #### Sliding Window Search
 
