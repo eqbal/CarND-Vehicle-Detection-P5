@@ -6,13 +6,25 @@ from sklearn.preprocessing import StandardScaler
 
 class WindowsSearch():
 
-    def __init__(self, classifier):
-        self.classifier   = classifier
+    def __init__(self, svc, X_scaler):
+        self.svc            = svc
+        self.X_scaler       = X_scaler
 
-        self.X_start_stop = [[None,None],[None,None],[None,None],[None,None]]
-        self.XY_window    = [(240, 240), (180, 180), (120, 120), (70, 70)]
-        self.XY_overlap   = [(0.75, 0.75), (0.75, 0.75), (0.75, 0.75), (0.75, 0.75)]
-        self.Y_start_stop = [[380, 500.0], [380, 470.0], [395, 455.0], [405, 440.0]]
+        self.color_space    = 'HLS'
+        self.spatial_size   = (16, 16)
+        self.hist_bins      = 32
+        self.orient         = 9
+        self.pix_per_cell   = 8
+        self.cell_per_block = 2
+        self.hog_channel    = 'ALL'
+        self.spatial_feat   = True
+        self.hist_feat      = True
+        self.hog_feat       = True
+
+        self.X_start_stop   = [[None,None],[None,None],[None,None],[None,None]]
+        self.XY_window      = [(240, 240), (180, 180), (120, 120), (70, 70)]
+        self.XY_overlap     = [(0.75, 0.75), (0.75, 0.75), (0.75, 0.75), (0.75, 0.75)]
+        self.Y_start_stop   = [[380, 500.0], [380, 470.0], [395, 455.0], [405, 440.0]]
 
 
     def search_all_frames(self, image):
@@ -29,18 +41,18 @@ class WindowsSearch():
             all_windows += [windows]
 
             hot_windows +=  search_windows(image, windows,
-                    self.classifier.svc,
-                    self.classifier.X_scaler,
-                    color_space=self.classifier.color_space,
-                    spatial_size=self.classifier.spatial_size,
-                    hist_bins=self.classifier.hist_bins,
-                    orient=self.classifier.orient,
-                    pix_per_cell=self.classifier.pix_per_cell,
-                    cell_per_block=self.classifier.cell_per_block,
-                    hog_channel=self.classifier.hog_channel,
-                    spatial_feat=self.classifier.spatial_feat,
-                    hist_feat=self.classifier.hist_feat,
-                    hog_feat=self.classifier.hog_feat)
+                    self.svc,
+                    self.X_scaler,
+                    color_space=self.color_space,
+                    spatial_size=self.spatial_size,
+                    hist_bins=self.hist_bins,
+                    orient=self.orient,
+                    pix_per_cell=self.pix_per_cell,
+                    cell_per_block=self.cell_per_block,
+                    hog_channel=self.hog_channel,
+                    spatial_feat=self.spatial_feat,
+                    hist_feat=self.hist_feat,
+                    hog_feat=self.hog_feat)
 
         return hot_windows,all_windows
 

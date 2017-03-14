@@ -93,7 +93,7 @@ class HOGClassifier():
             with open(FILE, 'wb') as pfile:
                 pickle.dump(
                     {   'svc':self.svc,
-                        'X_train': X_train,
+                        'X_scaller': self.X_scaller,
                         'color_space': self.color_space,
                         'spatial_size': self.spatial_size,
                         'hist_bins': self.hist_bins,
@@ -113,10 +113,5 @@ class HOGClassifier():
         print('Data cached in pickle file.')
 
     def load_model(self):
-        self.svc = pickle.load(open("saved_svc.p","rb"))
-
-
-
-
-
+        self.svc = pickle.load(open(FILE,"rb"))
 
