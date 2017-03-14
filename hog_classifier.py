@@ -14,7 +14,7 @@ class HOGClassifier():
     def __init__(self, dataset):
         self.color_space = 'HLS'
         self.spatial_size = (16, 16)
-        self.hist_bins = 32
+        self.hist_bins = 16
         self.orient = 9
         self.pix_per_cell = 8
         self.cell_per_block = 2
@@ -22,6 +22,7 @@ class HOGClassifier():
         self.spatial_feat = True
         self.hist_feat = True
         self.hog_feat = True
+
         self.dataset = dataset
 
     def extract_data_features(self):
@@ -49,13 +50,12 @@ class HOGClassifier():
 
         t2 = time.time()
         print(round(t2-t, 2), 'Seconds to extract HOG features...')
-
-        self.hog_features = np.vstack((self.car_features, self.non_car_features)).astype(np.float64)
-        print('Feature vectors shape:',self.hog_features.shape)
+        self.X = np.vstack((self.car_features, self.non_car_features)).astype(np.float64)
+        print('Feature vectors shape:',self.X.shape)
 
     def scale_features(self):
-        self.X_scaler = StandardScaler().fit(self.hog_features)
-        self.scaled_hog_features = self.X_scaler.transform(self.hog_features)
+        self.X_scaler = StandardScaler().fit(self.X)
+        self.scaled_X = self.X_scaler.transform(self.X)
 
     def get_labels(self):
         self.Y = np.hstack((np.ones(len(self.car_features)), np.zeros(len(self.non_car_features))))
