@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 from skimage.feature import hog
 
-# Define a function to return HOG features and visualization
+
 # Define a function to return HOG features and visualization
 def get_hog_features(img, orient, pix_per_cell, cell_per_block,
                         vis=False, feature_vec=True):
