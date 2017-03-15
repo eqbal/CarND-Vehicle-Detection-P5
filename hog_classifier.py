@@ -68,7 +68,7 @@ class HOGClassifier():
         notcar_split = len(self.non_car_features) * 0.2
 
         self.X_test = np.vstack((self.scaled_X[:int(car_split)],
-            self.scaled_X[len(car_features):(len(car_features) + int(notcar_split))]))
+            self.scaled_X[len(self.car_features):(len(self.car_features) + int(notcar_split))]))
 
         self.y_test = np.hstack((self.Y[:int(car_split)],
             self.Y[len(self.car_features):(len(self.car_features) + int(notcar_split))]))
