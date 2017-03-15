@@ -138,7 +138,6 @@ class WindowsSearch():
                         img_features.append(hog_features)
 
                     img_features = np.concatenate(img_features).reshape(1, -1)
-                    print(img_features.shape)
 
                     # Scale features and make a prediction
                     test_features   = self.X_scaler.transform(img_features)
