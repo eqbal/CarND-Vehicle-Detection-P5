@@ -9,8 +9,6 @@ import pickle
 
 class HOGClassifier():
 
-    FILE = 'processed_svc.p'
-
     def __init__(self, dataset):
         self.color_space = 'HLS'
         self.spatial_size = (16, 16)
@@ -94,7 +92,7 @@ class HOGClassifier():
     def save_data(self):
         print('Saving data to pickle file...')
         try:
-            with open(FILE, 'wb') as pfile:
+            with open('processed_svc.p', 'wb') as pfile:
                 pickle.dump(
                     {   'svc':self.svc,
                         'X_scaler': self.X_scaler

@@ -105,7 +105,7 @@ class WindowsSearch():
                     hog_feat2 = hog2[ypos:ypos+nblocks_per_window, xpos:xpos+nblocks_per_window].ravel()
                     hog_feat3 = hog3[ypos:ypos+nblocks_per_window, xpos:xpos+nblocks_per_window].ravel()
 
-                    if hog_channel == 'ALL':
+                    if self.hog_channel == 'ALL':
                         hog_features = np.hstack((hog_feat1, hog_feat2, hog_feat3))
                     elif hog_channel == '0':
                         hog_features = hog_feat1
