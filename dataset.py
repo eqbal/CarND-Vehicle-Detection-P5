@@ -38,8 +38,5 @@ class Dataset(object):
         self.X_test  = self.X_test.astype('float32')
 
     def inspect(self):
-        print('X_train shape:', self.X_train.shape)
-        print(self.X_train.shape[0], 'train samples')
-        print(self.X_test.shape[0], 'test samples')
         print(len(self.cars), 'images of vehicles')
         print(len(self.non_cars), 'images of non vehicles')

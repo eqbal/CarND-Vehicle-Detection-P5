@@ -64,11 +64,15 @@ class HOGClassifier():
         rand_state = np.random.randint(0, 100)
 
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
-            self.scaled_hog_features, self.Y, test_size=0.2, random_state=rand_state)
+            self.scaled_X, self.Y, test_size=0.2, random_state=rand_state)
 
         print('Using:',self.orient,'orientations',self.pix_per_cell,
             'pixels per cell and', self.cell_per_block,'cells per block')
         print('Feature vector length:', len(self.X_train[0]))
+
+        print('X_train shape:', self.X_train.shape)
+        print(self.X_train.shape[0], 'train samples')
+        print(self.X_test.shape[0], 'test samples')
 
     def train(self):
         svc = LinearSVC()
