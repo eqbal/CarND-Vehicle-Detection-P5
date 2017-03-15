@@ -28,6 +28,7 @@ class HOGClassifier():
 
         self.car_features = extract_features(self.dataset.cars,
                 color_space=self.color_space,
+                spatial_size=self.spatial_size,
                 orient=self.orient,
                 pix_per_cell=self.pix_per_cell,
                 cell_per_block=self.cell_per_block,
@@ -38,6 +39,7 @@ class HOGClassifier():
 
         self.non_car_features = extract_features(self.dataset.non_cars,
                 color_space=self.color_space,
+                spatial_size=self.spatial_size,
                 orient=self.orient,
                 pix_per_cell=self.pix_per_cell,
                 cell_per_block=self.cell_per_block,
@@ -59,25 +61,10 @@ class HOGClassifier():
         self.Y = np.hstack((np.ones(len(self.car_features)), np.zeros(len(self.non_car_features))))
 
     def split_up_data(self):
-        # rand_state = np.random.randint(0, 100)
+        rand_state = np.random.randint(0, 100)
 
-        # self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
-            # self.scaled_X, self.Y, test_size=0.2, random_state=rand_state)
-
-        car_split    = len(self.car_features) * 0.2
-        notcar_split = len(self.non_car_features) * 0.2
-
-        self.X_test = np.vstack((self.scaled_X[:int(car_split)],
-            self.scaled_X[len(self.car_features):(len(self.car_features) + int(notcar_split))]))
-
-        self.y_test = np.hstack((self.Y[:int(car_split)],
-            self.Y[len(self.car_features):(len(self.car_features) + int(notcar_split))]))
-
-        self.X_train = np.vstack((self.scaled_X[int(car_split):len(self.car_features)],
-            self.scaled_X[(len(self.car_features) + int(notcar_split)):]))
-
-        self.y_train = np.hstack((self.Y[int(car_split):len(self.car_features)],
-            self.Y[(len(self.car_features) + int(notcar_split)):]))
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+            self.scaled_X, self.Y, test_size=0.2, random_state=rand_state)
 
         print('Using:',self.orient,'orientations',self.pix_per_cell,
             'pixels per cell and', self.cell_per_block,'cells per block')
