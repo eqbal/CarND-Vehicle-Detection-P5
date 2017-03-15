@@ -11,7 +11,7 @@ class WindowsSearch():
 
         self.color_space    = 'HLS'
         self.spatial_size   = (16, 16)
-        self.hist_bins      = 16
+        self.hist_bins      = 32
         self.orient         = 9
         self.pix_per_cell   = 8
         self.cell_per_block = 2
@@ -60,7 +60,7 @@ class WindowsSearch():
             if scale != 1:
                 imshape = ctrans_tosearch.shape
                 ctrans_tosearch = cv2.resize(ctrans_tosearch,
-                                             (np.int(imshape[1]/self.scale), np.int(imshape[0]/self.scale)))
+                                             (np.int(imshape[1]/scale), np.int(imshape[0]/scale)))
 
             ch1 = ctrans_tosearch[:,:,0]
             ch2 = ctrans_tosearch[:,:,1]
@@ -73,9 +73,13 @@ class WindowsSearch():
             nfeat_per_block = self.orient*self.cell_per_block**2
 
             # Compute individual channel HOG features for the entire image
-            hog1 = get_hog_features(ch1, self.orient, self.pix_per_cell, self.cell_per_block, feature_vec=False)
-            hog2 = get_hog_features(ch2, self.orient, self.pix_per_cell, self.cell_per_block, feature_vec=False)
-            hog3 = get_hog_features(ch3, self.orient, self.pix_per_cell, self.cell_per_block, feature_vec=False)
+            hog1 = get_hog_features(ch1, self.orient,
+                    self.pix_per_cell, self.cell_per_block, feature_vec=False)
+            hog2 = get_hog_features(ch2, self.orient,
+                    self.pix_per_cell, self.cell_per_block, feature_vec=False)
+            hog3 = get_hog_features(ch3, self.orient,
+                    self.pix_per_cell, self.cell_per_block, feature_vec=False)
+
 
             # 64 was the orginal sampling rate, with 8 cells and 8 pix per cell
             nblocks_per_window = (self.window // self.pix_per_cell)-1
@@ -118,8 +122,7 @@ class WindowsSearch():
                     ytop  = ypos*self.pix_per_cell
 
                     # Extract the image patch
-                    subimg = cv2.resize(
-                            ctrans_tosearch[ytop:ytop+self.window, xleft:xleft+self.window], (64,64))
+                    subimg = cv2.resize(ctrans_tosearch[ytop:ytop+self.window, xleft:xleft+self.window], (64,64))
 
                     # Get color features
                     spatial_features = bin_spatial(subimg, size=self.spatial_size)
@@ -135,6 +138,7 @@ class WindowsSearch():
                         img_features.append(hog_features)
 
                     img_features = np.concatenate(img_features).reshape(1, -1)
+                    print(img_features.shape)
 
                     # Scale features and make a prediction
                     test_features   = self.X_scaler.transform(img_features)
@@ -142,11 +146,10 @@ class WindowsSearch():
 
                     xbox_left = np.int(xleft*scale)
                     ytop_draw = np.int(ytop*scale)
-                    win_draw = np.int(window*scale)
+                    win_draw = np.int(self.window*scale)
 
                     if test_prediction == 1:
-                        hot_windows.append((
-                            (xbox_left, ytop_draw+y_start_stop[0]),
+                        hot_windows.append(((xbox_left, ytop_draw+y_start_stop[0]),
                             (xbox_left+win_draw,ytop_draw+win_draw+y_start_stop[0])))
 
         return hot_windows
