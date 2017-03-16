@@ -56,7 +56,7 @@ In this project, I'll be using both techniques, in Classification one, we will b
 
 ## Classification:
 
-###Steps:
+####Steps:
 
 - Perform a Histogram of Oriented Gradients (HOG) feature extraction on a labeled training set of images and train a classifier Linear SVM classifier
 - Optionally, you can also apply a color transform and append binned color features, as well as histograms of color, to your HOG feature vector. 
@@ -65,7 +65,7 @@ In this project, I'll be using both techniques, in Classification one, we will b
 - Run your pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
 - Estimate a bounding box for vehicles detected.
 
-###[Rubric](https://review.udacity.com/#!/rubrics/513/view):
+####[Rubric](https://review.udacity.com/#!/rubrics/513/view):
 
 #### Data Exploration
 
@@ -107,8 +107,6 @@ The HOG extractor is a way to extract meaningful features of a image. It capture
 
 HOG stands for (Histogram of Oriented Gradients). Basically, it divides an image in several pieces. For each piece, it calculates the gradient of variation in a given number of orientations.
 
-![Features](./assets/feature_extrac.png)
-
 You can find the code for extracting features in `HOGClassifier` class, method `extract_data_features`. 
 
 I used the labeled data set [vehicles](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/vehicles.zip) and [non-vehicles](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/non-vehicles.zip) to extract the HOG features. 
@@ -138,7 +136,7 @@ There were a lot of false positives. I found that "All" performed well with the 
 
 I used a low value of pixels_per_cell=8. Using larger values of than orient=9 did not have a striking effect and only increased the feature vector. Similarly, using values larger than cells_per_block=2 did not improve results.
 
-```
+```python
 from hog_classifier import *
 cla = HOGClassifier(dataset)
 cla.extract_data_features()
