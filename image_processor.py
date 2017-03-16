@@ -5,14 +5,14 @@ from scipy.ndimage.measurements import label
 
 class ImageProcessor():
     def __init__(self, win_search):
-        win_search = win_search
+        self.win_search = win_search
 
     def call(self, image):
         draw_image = np.copy(image)
 
         heatmap = np.zeros((image.shape[0], image.shape[1]), np.uint8)
 
-        hot_windows = win_search.find_cars(image)
+        hot_windows = self.win_search.find_cars(image)
 
         heatmap = add_heat(heatmap, hot_windows)
 
