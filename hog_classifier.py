@@ -21,6 +21,8 @@ class HOGClassifier():
         self.hist_feat = True
         self.hog_feat = True
 
+        self.dataset = dataset
+
 
     def extract_data_features(self):
         t=time.time()
