@@ -1,36 +1,54 @@
-
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 import random
 
+from cnn_helpers import *
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten,Lambda
 from keras.layers import Convolution2D, MaxPooling2D
 from keras.utils import np_utils
 from keras import backend as K
+import matplotlib.pylab as plt
 
 class ObjectDetectionNet(object):
 
-    FILE_PATH = 'model.h5'
+    FILE_PATH = 'yolo.weights'
 
-    def __init__(self, dataset):
+    def __init__(self):
         self.model = None
-        self.dataset = dataset
-        self.input_shape =  (3,64,64)
+        self.input_shape = (3,448,448)
 
     def build_model(self):
         model = Sequential()
-        model.add(Lambda(lambda x: x/127.5 - 1.,input_shape=self.input_shape, output_shape=self.input_shape))
-        model.add(Convolution2D(10, 3, 3, activation='relu', name='conv1',input_shape=input_shape, border_mode="same"))
-        model.add(Convolution2D(10, 3, 3, activation='relu', name='conv2',border_mode="same"))
-        model.add(MaxPooling2D(pool_size=(8,8)))
-        model.add(Dropout(0.25))
-        model.add(Convolution2D(128,8,8,activation="relu",name="dense1"))
-        model.add(Dropout(0.5))
-        model.add(Convolution2D(1,1,1,name="dense2", activation="tanh"))
+        model.add(Convolution2D(16, 3, 3,input_shape=self.input_shape,border_mode='same',subsample=(1,1)))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2)))
+        model.add(Convolution2D(32,3,3 ,border_mode='same'))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),border_mode='valid'))
+        model.add(Convolution2D(64,3,3 ,border_mode='same'))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),border_mode='valid'))
+        model.add(Convolution2D(128,3,3 ,border_mode='same'))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),border_mode='valid'))
+        model.add(Convolution2D(256,3,3 ,border_mode='same'))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),border_mode='valid'))
+        model.add(Convolution2D(512,3,3 ,border_mode='same'))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(MaxPooling2D(pool_size=(2, 2),border_mode='valid'))
+        model.add(Convolution2D(1024,3,3 ,border_mode='same'))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(Convolution2D(1024,3,3 ,border_mode='same'))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(Convolution2D(1024,3,3 ,border_mode='same'))
+        model.add(LeakyReLU(alpha=0.1))
         model.add(Flatten())
-
-        self.model = model
+        model.add(Dense(256))
+        model.add(Dense(4096))
+        model.add(LeakyReLU(alpha=0.1))
+        model.add(Dense(1470))
 
     def summary(self):
         self.model.summary()
@@ -38,28 +56,34 @@ class ObjectDetectionNet(object):
     def compile(self):
         self.model.compile(loss='mse',optimizer='adadelta',metrics=['accuracy'])
 
+    def load_weights():
+        data = np.fromfile(self.FILE_PATH,np.float32)
+        data=data[4:]
+
+        index = 0
+        for layer in self.model.layers:
+            shape = [w.shape for w in layer.get_weights()]
+            if shape != []:
+                kshape,bshape = shape
+                bia = data[index:index+np.prod(bshape)].reshape(bshape)
+                index += np.prod(bshape)
+                ker = data[index:index+np.prod(kshape)].reshape(kshape)
+                index += np.prod(kshape)
+                layer.set_weights([ker,bia])
 
     def train(self):
         print('Start training.')
         self.model.fit(
-                self.X_train,
-                self.Y_train,
+                self.dataset.X_train,
+                self.dataset.Y_train,
                 batch_size=128,
                 nb_epoch=20,
                 verbose=1,
-                validation_data=(self.X_test, self.Y_test)
+                validation_data=(self.dataset.X_test, self.dataset.Y_test)
         )
 
-    def save(self):
-        self.model.save(self.FILE_PATH)
-        print('Model Saved.')
-
-    def load(self):
-        print('Model Loaded.')
-        self.model = load_model(self.FILE_PATH)
-
     def evaluate(self):
-        score = self.model.evaluate(self.X_test, self.Y_test, verbose=0)
+        score = self.model.evaluate(self.dataset.X_test, self.dataset.Y_test, verbose=0)
         print('Test score:', score[0])
         print('Test accuracy:', score[1])
 
@@ -68,4 +92,3 @@ class ObjectDetectionNet(object):
         result = self.model.predict_proba(image)
         print(result)
         return result[0]
-
