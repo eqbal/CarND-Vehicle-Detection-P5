@@ -26,7 +26,7 @@ We can use one of the two approaches to solve this problem:
 
 In this project, I'll be using both techniques, in Classification one, we will be able to lower the false positives further. Once I'm done, I'll be using Regression with YOLO and compare the results.
 
-##Files:
+## Files:
 
   - `ObjectDetectionNet`:
     - CNN network to use the Regression tp detect object.
