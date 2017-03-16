@@ -17,7 +17,7 @@ class ImageProcessor():
         heatmap = add_heat(heatmap, hot_windows)
 
 
-        heatmap = apply_threshold(heatmap,2) 
+        heatmap = apply_threshold(heatmap,2)
         heat = apply_threshold(heat,3)
 
         # Find final boxes from heatmap using label function
