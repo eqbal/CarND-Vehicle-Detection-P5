@@ -413,6 +413,10 @@ Non-trainable params: 0
 ____________________________________________________________________________________________________
 ```
 
+I used a trained weights can downloaded from [here](https://drive.google.com/file/d/0B1tW_VtY7onibmdQWE1zVERxcjQ/view?usp=sharing), and load them into our `ObjectDetectionNet` model. 
+
+The weight loading function is in the `load_weight` function in the `ObjectDetectionNet` class.
+
 ```python
 import glob
 
@@ -461,5 +465,9 @@ The final result of my algorithm for this project video can be found here:
 
 [![Advanced Lane Line Detection](http://img.youtube.com/vi/0VQoK5jM9Rk/0.jpg)](http://www.youtube.com/watch?v=0VQoK5jM9Rk)
 
-## Conclusion & Discussion
+#### Discussion
+
+ YOLO stands for "You only look once" and tiles an image into a modest number of squares. Each of the squares is responsible for predicting whether there is an object centered around it and if so predicting the shape of its bounding box.
+ 
+ The YOLO is known to be fast. In this project, I used the weights of YOLOv1 trained on the Common Objects in Context dataset which is also available at the darknet website. Feeding in the project video on a GTX 1080 averages about 20x faster than the current SVM + HOG pipeline.
 
