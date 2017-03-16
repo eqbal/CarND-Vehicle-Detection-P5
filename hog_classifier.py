@@ -10,7 +10,7 @@ import pickle
 class HOGClassifier():
 
     def __init__(self, dataset):
-        self.color_space = 'HLS'
+        self.color_space = 'YCrCb'
         self.spatial_size = (16, 16)
         self.hist_bins = 16
         self.orient = 9
@@ -21,7 +21,6 @@ class HOGClassifier():
         self.hist_feat = True
         self.hog_feat = True
 
-        self.dataset = dataset
 
     def extract_data_features(self):
         t=time.time()
