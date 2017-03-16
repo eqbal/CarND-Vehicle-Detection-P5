@@ -52,6 +52,7 @@ In this project, I'll be using both techniques, in Classification one, we will b
   - `helpers.py`:
     - I has all the helpers methods we got in the class 
 
+* Note: I'm using EC2 t2.large instance type with GPU for my training and running my tests.
 
 ## Classification:
 
