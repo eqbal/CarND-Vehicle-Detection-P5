@@ -3,7 +3,6 @@ import numpy as np
 import cv2
 from skimage.feature import hog
 
-
 # Define a function to return HOG features and visualization
 def get_hog_features(img, orient, pix_per_cell, cell_per_block,
                         vis=False, feature_vec=True):
@@ -25,14 +24,14 @@ def get_hog_features(img, orient, pix_per_cell, cell_per_block,
         return features
 
 # Define a function to compute binned color features
-def bin_spatial(img, size=(32, 32)):
+def bin_spatial(img, size=(16, 16)):
     # Use cv2.resize().ravel() to create the feature vector
     features = cv2.resize(img, size).ravel()
     # Return the feature vector
     return features
 
 # Define a function to compute color histogram features
-def color_hist(img, nbins=32, bins_range=(0, 256)):
+def color_hist(img, nbins=16, bins_range=(0, 256)):
     # Compute the histogram of the color channels separately
     channel1_hist = np.histogram(img[:,:,0], bins=nbins, range=bins_range)
     channel2_hist = np.histogram(img[:,:,1], bins=nbins, range=bins_range)
@@ -61,9 +60,9 @@ def convert_color(img, color_space='RGB'):
 
 # Define a function to extract features from a list of images
 # Have this function call get_hog_features(), bin_spatial() and color_hist()
-def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
-                        hist_bins=32, orient=9,
-                        pix_per_cell=8, cell_per_block=2, hog_channel=0,
+def extract_features(imgs, color_space='RGB', spatial_size=(16, 16),
+                        hist_bins=16, orient=9,
+                        pix_per_cell=8, cell_per_block=2, hog_channel='ALL',
                         spatial_feat=True, hist_feat=True, hog_feat=True):
     # Create a list to append feature vectors to
     features = []
@@ -111,3 +110,52 @@ def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6):
         cv2.rectangle(imcopy, bbox[0], bbox[1], color, thick)
     # Return the image copy with boxes drawn
     return imcopy
+
+def add_heat(heatmap, bbox_list):
+    # Iterate through list of bboxes
+    for box in bbox_list:
+        # Add += 1 for all pixels inside each bbox
+        # Assuming each "box" takes the form ((x1, y1), (x2, y2))
+        heatmap[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
+
+    # Return updated heatmap
+    return heatmap# Iterate through list of bboxes
+ 
+def apply_threshold(heatmap, threshold):
+    # Zero out pixels below the threshold
+    heatmap[heatmap <= threshold] = 0
+    # Return thresholded map
+    return heatmap
+
+
+def draw_labeled_bboxes(img, labels):
+    # Iterate through all detected cars
+    for car_number in range(1, labels[1]+1):
+        # Find pixels with each car_number label value
+        nonzero = (labels[0] == car_number).nonzero()
+        # Identify x and y values of those pixels
+        nonzeroy = np.array(nonzero[0])
+        nonzerox = np.array(nonzero[1])
+        # Define a bounding box based on min/max x and y
+        bbox = ((np.min(nonzerox), np.min(nonzeroy)), (np.max(nonzerox), np.max(nonzeroy)))
+        # Draw the box on the image
+        cv2.rectangle(img, bbox[0], bbox[1], (0,0,255), 6)
+    # Return the image
+    return img
+
+def remove_false_positives(labels):
+    bboxes = []
+    # Iterate through all detected cars
+    for car_number in range(1, labels[1]+1):
+        # Find pixels with each car_number label value
+        nonzero = (labels[0] == car_number).nonzero()
+        # Identify x and y values of those pixels
+        nonzeroy = np.array(nonzero[0])
+        nonzerox = np.array(nonzero[1])
+        # Define a bounding box based on min/max x and y
+        bbox = ((np.min(nonzerox), np.min(nonzeroy)), (np.max(nonzerox), np.max(nonzeroy)))
+
+        if (bbox[1][0]-bbox[0][0]+1)*(bbox[1][1]-bbox[0][1]+1) > 4000 and (bbox[1][0]-bbox[0][0]+1)*(bbox[1][1]-bbox[0][1]+1) < 40000:
+            bboxes.append(bbox)
+    # Return the bounding bounding boses
+    return bboxes
