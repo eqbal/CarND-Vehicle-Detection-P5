@@ -9,9 +9,9 @@ class WindowsSearch():
         self.svc            = svc
         self.X_scaler       = X_scaler
 
-        self.color_space    = 'HLS'
+        self.color_space    = 'YCrCb'
         self.spatial_size   = (16, 16)
-        self.hist_bins      = 32
+        self.hist_bins      = 16
         self.orient         = 9
         self.pix_per_cell   = 8
         self.cell_per_block = 2
@@ -152,3 +152,5 @@ class WindowsSearch():
                             (xbox_left+win_draw,ytop_draw+win_draw+y_start_stop[0])))
 
         return hot_windows
+
+

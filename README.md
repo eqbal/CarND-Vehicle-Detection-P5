@@ -43,6 +43,9 @@ In this project, I'll be using both techniques, in Classification one, we will b
   - `WindowsSearch`:
     - Implements the search over all zones and windows.
 
+  - `ImageProcessor`:
+    - Pipeline to process images, apply heatmap and threshold
+
   - `Playground.ipynb`:
     - Where I run the previous two classes to train the data and test it out
 

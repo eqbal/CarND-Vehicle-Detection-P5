@@ -24,14 +24,14 @@ def get_hog_features(img, orient, pix_per_cell, cell_per_block,
         return features
 
 # Define a function to compute binned color features
-def bin_spatial(img, size=(32, 32)):
+def bin_spatial(img, size=(16, 16)):
     # Use cv2.resize().ravel() to create the feature vector
     features = cv2.resize(img, size).ravel()
     # Return the feature vector
     return features
 
 # Define a function to compute color histogram features
-def color_hist(img, nbins=32, bins_range=(0, 256)):
+def color_hist(img, nbins=16, bins_range=(0, 256)):
     # Compute the histogram of the color channels separately
     channel1_hist = np.histogram(img[:,:,0], bins=nbins, range=bins_range)
     channel2_hist = np.histogram(img[:,:,1], bins=nbins, range=bins_range)
@@ -60,9 +60,9 @@ def convert_color(img, color_space='RGB'):
 
 # Define a function to extract features from a list of images
 # Have this function call get_hog_features(), bin_spatial() and color_hist()
-def extract_features(imgs, color_space='RGB', spatial_size=(32, 32),
-                        hist_bins=32, orient=9,
-                        pix_per_cell=8, cell_per_block=2, hog_channel=0,
+def extract_features(imgs, color_space='RGB', spatial_size=(16, 16),
+                        hist_bins=16, orient=9,
+                        pix_per_cell=8, cell_per_block=2, hog_channel='ALL',
                         spatial_feat=True, hist_feat=True, hog_feat=True):
     # Create a list to append feature vectors to
     features = []
