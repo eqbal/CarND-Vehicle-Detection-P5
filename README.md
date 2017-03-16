@@ -103,18 +103,20 @@ Check out below 5 random samples for cars and non-cars images:
 
 #### Histogram of Oriented Gradients (HOG)
 
-The HOG extractor is the heart of the method described here. It is a way to extract meaningful features of a image. It captures the general aspect of cars, not the specific details of it. It is the same as we, humans do, in a first glance, we locate the car, not the make, the plate, the wheel, or other small detail.
+The HOG extractor is a way to extract meaningful features of a image. It captures the general aspect of cars, not the specific details of it. It is the same as we, humans do, in a first glance, we locate the car, not the make, the plate, the wheel, or other small detail.
 
-HOG stands for (Histogram of Oriented Gradients). Basically, it divides an image in several pieces. For each piece, it calculates the gradient of variation in a given number of orientations. Example of HOG detector — the idea is the image on the right to capture the essence of original image.
+HOG stands for (Histogram of Oriented Gradients). Basically, it divides an image in several pieces. For each piece, it calculates the gradient of variation in a given number of orientations.
 
 ![Features](./assets/feature_extrac.png)
 
-My code for extracting features in `HOGClassifier` class. 
+You can find the code for extracting features in `HOGClassifier` class, method `extract_data_features`. 
 
-I used the following params in my class (trial and error approach):
+I used the labeled data set [vehicles](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/vehicles.zip) and [non-vehicles](https://s3.amazonaws.com/udacity-sdc/Vehicle_Tracking/non-vehicles.zip) to extract the HOG features. 
+
+I ended wup with the following params for the HOG extractor (trial and error approach):
 
 ```
-color_space = 'HLS'
+color_space = 'YCrCb'
 spatial_size = (16, 16)
 hist_bins = 32
 orient = 9
@@ -126,11 +128,29 @@ hist_feat = True
 hog_feat = True
 ``` 
 
-As you can see, I used HLS space and a low value of pixels_per_cell=(8,8). Using larger values of than orient=9 did not have a striking effect and only increased the feature vector. Similarly, using values larger than cells_per_block=(2,2) did not improve results.
+I tried different color spaces, such as, HLS, HSV, YCrCb and found that YCrCb generated the best result when I tried using the trained model to detect vehicles in the test images.
 
-The HOG algorithm is robust for small variations and different angles. But, on the other way, it can detect also some image that has the same general aspect of the car, but it not a car at all — the so called “False positives”.
+Also, I tested 0,1,2 and 'All' HOG channels and found that 0 performed the worst. 1 & 2 performed well with the validation set with accuracy > 0.98 but bad when detecting vehicles in the test images.
 
-The same could be made with a color detector, in addition to HOG detector. Because the HOG only classifier was good enough, I used it in the rest of project.
+There were a lot of false positives. I found that "All" performed well with the validation set with accuracy = 0.9462 but very well when detecting vehicles in the test images. Not much false positives were found. Therfore, i decided to use all 3 channels for HOG features
+
+![Hog Features](./assets/hog_features.png)
+
+I used a low value of pixels_per_cell=8. Using larger values of than orient=9 did not have a striking effect and only increased the feature vector. Similarly, using values larger than cells_per_block=2 did not improve results.
+
+```
+from hog_classifier import *
+cla = HOGClassifier(dataset)
+cla.extract_data_features()
+```
+
+```
+82.67 Seconds to extract HOG features...
+Feature vectors shape: (17760, 6108)
+```
+
+I used the `StandardScaler` to scale/normalize our training set (`HOGClassifier.scale_features()`). 
+
 
 #### The SVC Classifier
 
@@ -140,13 +160,42 @@ The next step was to train a classifier. It receives the cars / non-cars data tr
 
 In this case, I used a Support Vector Machine Classifier (SVC), with linear kernel, based on function SVM from scikit-learn.
 
-To train my SVM classifier, I used all channels of images converted to HLS space. I included spatial features color features as well as all three HLS channels, because using less than all three channels reduced the accuracy considerably. 
+To train my SVM classifier, I used all channels of images converted to YCrCb space.
+
+I included spatial features color features as well as all three YCrCb channels, because using less than all three channels reduced the accuracy considerably. 
 
 The final feature vector has a length of `8460` elements, most of which are HOG features. 
 
-For color binning patches of spatial_size=(16,16) were generated and color histograms were implemented using hist_bins=32 used.
+For color binning patches of spatial_size=(16,16) were generated and color histograms were implemented using hist_bins=16 used.
 
-After training on the training set this resulted in a validation and test accuracy of `0.9893`. It took about `110.73` secs to extract the data. To train the classifier it took `92.77 Seconds`. Please refer to the `Playground` notebook to check out my findings. 
+Because there are a lot of time series data in the label data, I manually separated the vehicle and non-vehicle data into training and test set. I put the first 20% of vehicle data and non-vehicle data to the test set and the rest to the training set.
+
+```
+cla.scale_features()
+cla.get_labels()
+cla.split_up_data()
+```
+
+```
+Using: 9 orientations 8 pixels per cell and 2 cells per block
+Feature vector length: 6108
+X_train shape: (14209, 6108)
+14209 train samples
+(14209, 6108) X_train.shape
+(14209,) y_train.shape
+(3551, 6108) X_test
+(3551,) y_test shape
+(17760, 6108) scaled_X shape
+(17760,) y  shape
+```
+
+```python
+cla.train()
+# 18.98 Seconds to train SVC...
+cla.accuracy()
+# Test Accuracy of SVC =  0.9462
+
+```
 
 The average time for a prediction (average over a hundred predictions) turned out to be about 3.3ms on my macbook pro with i7 processor, thus allowing a theoretical bandwidth of 300Hz.
 
@@ -175,12 +224,111 @@ First, I cropped just the interest region. Then sliced the image in small frames
 
 In `WindowsSearch` class I handle all the logic for sliding window search.
 
-- I segmented the image into 4 partially overlapping zones with different sliding window sizes to account for different distances.
-- The window sizes are 240,180,120 and 70 pixels for each zone
-- Within each zone adjacent windows have an ovelap of 75%
+- I chose 5 sizes of the sliding window sizes with scales (1, 1.5, 2, 2.5 and 4) of default window 64 x 64. I originally didn't choose scale of 4 times bigger than 64 x 64 but found that the pipeline couldn't detect vehicles that were very close to the car.
+- I set the cells per step to be 1 because it gave the best detection when i applied the heat map to remove false positives. And I added 1 more window to the right and to the bottom of the image so that it could detect the edge better.
+- Also, I limited the area that each sliding window can search. Below shows the search area each sliding window would search for but please note that for illusation purposes I only included every other windows in the image.
 
+
+![Windows](./assets/windows.png)
+
+```python
+from windows_search import *
+
+win_search  = WindowsSearch(cla.svc, cla.X_scaler)
+
+image       = mpimg.imread("./test_images/test3.jpg")
+
+draw_image  = np.copy(image)
+hot_windows = win_search.find_cars(image)
+draw_image  = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
+
+f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+f.tight_layout()
+
+ax1.imshow(draw_image)
+plt.show()
+
+```
+
+![Find Car](./assets/find_car.png)
 
 #### Video Implementation
+
+I created `ImageProcessor` class as a pipeline on a video stream and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.
+
+```python
+class ImageProcessor():
+    def __init__(self, win_search):
+        self.win_search = win_search
+
+    def call(self, image):
+        draw_image = np.copy(image)
+
+        heatmap = np.zeros((image.shape[0], image.shape[1]), np.uint8)
+
+        hot_windows = self.win_search.find_cars(image)
+
+        heatmap = add_heat(heatmap, hot_windows)
+
+        heatmap = apply_threshold(heatmap,3)
+
+        # Find final boxes from heatmap using label function
+        labels = label(heatmap)
+
+        # draw the bounding box on the image 
+        draw_image = np.copy(image)
+        draw_image = draw_labeled_bboxes(draw_image, labels)
+
+        return draw_image
+```
+
+I ran the video stream through the pipeline and here are the examples of the vehicle detection and the corresponding heatmap.
+
+Since the pipeline detected the vehicle pretty well, I created a heatmap for each frame and applied threshold = 3 to filter out any false positives.
+
+![Heatmap](./assets/heatmap.png)
+
+After finding the heatmap, I applied the scipy.ndimage.measurements.label method to find the bounding boxes of the vehicles
+
+![Heatmap2](./assets/heatmap2.png)
+
+```python
+
+from image_processor import *
+pipe = ImageProcessor(win_search)
+
+from moviepy.editor import VideoFileClip
+from IPython.display import HTML
+
+
+output_file = 'test_video_out.mp4'
+input_clip = VideoFileClip("test_video.mp4")
+output_clip = input_clip.fl_image(pipe.call) 
+%time output_clip.write_videofile(output_file, audio=False)
+```
+
+```
+
+[MoviePy] >>>> Building video test_video_out.mp4
+[MoviePy] Writing video test_video_out.mp4
+ 97%|█████████▋| 38/39 [01:14<00:01,  1.96s/it]
+[MoviePy] Done.
+[MoviePy] >>>> Video ready: test_video_out.mp4 
+
+CPU times: user 1min 14s, sys: 124 ms, total: 1min 14s
+Wall time: 1min 16s
+
+```
+
+#### Descussion
+
+- The success of vehcile detection really depended on how good the trained classifier was. When I tried different input features and different classifiers, I found that there were a lot of false positives which made it very hard to detect the vehcile accurately. Once I found the input features and classifier to use, there were a lot less false positives.
+
+- The time it took to process the video is too long. It is not possible to run this in real time scenario. I would probably try to reduce the number sliding windows that I used to do the vehicle detection and attain the same result.
+
+- Some false positives still remain after heatmap filtering. This should be improvable by using more labeled data.
+
+- The evaluation of feature vectors is currently done sequentially, but could easily be parallelized using some libraries
 
 ## Regression
 
