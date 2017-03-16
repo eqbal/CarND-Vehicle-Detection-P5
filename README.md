@@ -318,6 +318,12 @@ Wall time: 1min 16s
 
 ```
 
+#### Video Output
+
+The final result of my algorithm for this project video can be found here:
+
+[![Advanced Lane Line Detection](http://img.youtube.com/vi/ijivDj8dIKo/0.jpg)](http://www.youtube.com/watch?v=ijivDj8dIKo)
+
 #### Descussion
 
 - The success of vehcile detection really depended on how good the trained classifier was. When I tried different input features and different classifiers, I found that there were a lot of false positives which made it very hard to detect the vehcile accurately. Once I found the input features and classifier to use, there were a lot less false positives.
@@ -329,6 +335,131 @@ Wall time: 1min 16s
 - The evaluation of feature vectors is currently done sequentially, but could easily be parallelized using some libraries
 
 ## Regression
+
+```python
+from object_detection_net import *
+
+cnn = ObjectDetectionNet()
+cnn.build_model()
+cnn.load_weights()
+cnn.summary()
+```
+
+```
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+convolution2d_1 (Convolution2D)  (None, 16, 448, 448)  448         convolution2d_input_1[0][0]      
+____________________________________________________________________________________________________
+leakyrelu_1 (LeakyReLU)          (None, 16, 448, 448)  0           convolution2d_1[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_1 (MaxPooling2D)    (None, 16, 224, 224)  0           leakyrelu_1[0][0]                
+____________________________________________________________________________________________________
+convolution2d_2 (Convolution2D)  (None, 32, 224, 224)  4640        maxpooling2d_1[0][0]             
+____________________________________________________________________________________________________
+leakyrelu_2 (LeakyReLU)          (None, 32, 224, 224)  0           convolution2d_2[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_2 (MaxPooling2D)    (None, 32, 112, 112)  0           leakyrelu_2[0][0]                
+____________________________________________________________________________________________________
+convolution2d_3 (Convolution2D)  (None, 64, 112, 112)  18496       maxpooling2d_2[0][0]             
+____________________________________________________________________________________________________
+leakyrelu_3 (LeakyReLU)          (None, 64, 112, 112)  0           convolution2d_3[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_3 (MaxPooling2D)    (None, 64, 56, 56)    0           leakyrelu_3[0][0]                
+____________________________________________________________________________________________________
+convolution2d_4 (Convolution2D)  (None, 128, 56, 56)   73856       maxpooling2d_3[0][0]             
+____________________________________________________________________________________________________
+leakyrelu_4 (LeakyReLU)          (None, 128, 56, 56)   0           convolution2d_4[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_4 (MaxPooling2D)    (None, 128, 28, 28)   0           leakyrelu_4[0][0]                
+____________________________________________________________________________________________________
+convolution2d_5 (Convolution2D)  (None, 256, 28, 28)   295168      maxpooling2d_4[0][0]             
+____________________________________________________________________________________________________
+leakyrelu_5 (LeakyReLU)          (None, 256, 28, 28)   0           convolution2d_5[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_5 (MaxPooling2D)    (None, 256, 14, 14)   0           leakyrelu_5[0][0]                
+____________________________________________________________________________________________________
+convolution2d_6 (Convolution2D)  (None, 512, 14, 14)   1180160     maxpooling2d_5[0][0]             
+____________________________________________________________________________________________________
+leakyrelu_6 (LeakyReLU)          (None, 512, 14, 14)   0           convolution2d_6[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_6 (MaxPooling2D)    (None, 512, 7, 7)     0           leakyrelu_6[0][0]                
+____________________________________________________________________________________________________
+convolution2d_7 (Convolution2D)  (None, 1024, 7, 7)    4719616     maxpooling2d_6[0][0]             
+____________________________________________________________________________________________________
+leakyrelu_7 (LeakyReLU)          (None, 1024, 7, 7)    0           convolution2d_7[0][0]            
+____________________________________________________________________________________________________
+convolution2d_8 (Convolution2D)  (None, 1024, 7, 7)    9438208     leakyrelu_7[0][0]                
+____________________________________________________________________________________________________
+leakyrelu_8 (LeakyReLU)          (None, 1024, 7, 7)    0           convolution2d_8[0][0]            
+____________________________________________________________________________________________________
+convolution2d_9 (Convolution2D)  (None, 1024, 7, 7)    9438208     leakyrelu_8[0][0]                
+____________________________________________________________________________________________________
+leakyrelu_9 (LeakyReLU)          (None, 1024, 7, 7)    0           convolution2d_9[0][0]            
+____________________________________________________________________________________________________
+flatten_1 (Flatten)              (None, 50176)         0           leakyrelu_9[0][0]                
+____________________________________________________________________________________________________
+dense_1 (Dense)                  (None, 256)           12845312    flatten_1[0][0]                  
+____________________________________________________________________________________________________
+dense_2 (Dense)                  (None, 4096)          1052672     dense_1[0][0]                    
+____________________________________________________________________________________________________
+leakyrelu_10 (LeakyReLU)         (None, 4096)          0           dense_2[0][0]                    
+____________________________________________________________________________________________________
+dense_3 (Dense)                  (None, 1470)          6022590     leakyrelu_10[0][0]               
+====================================================================================================
+Total params: 45,089,374
+Trainable params: 45,089,374
+Non-trainable params: 0
+____________________________________________________________________________________________________
+```
+
+```python
+import glob
+
+images = [plt.imread(file) for file in glob.glob('./test_images/*.jpg')]
+batch = np.array([np.transpose(cv2.resize(image[300:650,500:,:],(448,448)),(2,0,1)) 
+                  for image in images])
+
+batch = 2*(batch/255.) - 1
+
+out = cnn.model.predict(batch)
+
+f,((ax1,ax2),(ax3,ax4),(ax5,ax6)) = plt.subplots(3,2,figsize=(11,10))
+for i,ax in zip(range(len(batch)),[ax1,ax2,ax3,ax4,ax5,ax6]):
+    boxes = out_to_car_boxes(out[i], threshold = 0.17)
+    ax.imshow(draw_box(boxes,images[i],[[500,1280],[300,650]]))
+
+plt.show()
+```
+
+![CNN Detector](./assets/cnn_detector.png)
+
+#### Video Output
+```python
+from moviepy.editor import VideoFileClip
+from IPython.display import HTML
+
+
+output_file = 'project_video_lane.mp4'
+input_clip = VideoFileClip("project_video_lane_out.mp4")
+output_clip = input_clip.fl_image(cnn.pipeline) 
+%time output_clip.write_videofile(output_file, audio=False)
+
+```
+
+```
+[MoviePy] >>>> Building video project_video_lane.mp4
+[MoviePy] Writing video project_video_lane.mp4
+100%|█████████▉| 1260/1261 [17:19<00:00,  1.24it/s]
+[MoviePy] Done.
+[MoviePy] >>>> Video ready: project_video_lane.mp4 
+
+CPU times: user 1h 45min 16s, sys: 4min 35s, total: 1h 49min 52s
+Wall time: 17min 20s
+```
+The final result of my algorithm for this project video can be found here:
+
+[![Advanced Lane Line Detection](http://img.youtube.com/vi/0VQoK5jM9Rk/0.jpg)](http://www.youtube.com/watch?v=0VQoK5jM9Rk)
 
 ## Conclusion & Discussion
 
